@@ -1,15 +1,28 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
+"""
+This script reads endpoint files and creates histograms of fragment masses with double Gaussian fits.
+"""
+
 import os
 
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.optimize import curve_fit
 
-def gaussian(x, amplitude, mean, stddev):
-    """Gaussian function for curve fitting"""
-    return amplitude * np.exp(-(x - mean) ** 2 / (2 * stddev ** 2))
+
+def double_gaussian(x, amp1, mean1, sigma1, amp2, mean2, sigma2):
+    """Double Gaussian function for curve fitting"""
+    gaussian1 = amp1 * np.exp(-(x - mean1) ** 2 / (2 * sigma1 ** 2))
+    gaussian2 = amp2 * np.exp(-(x - mean2) ** 2 / (2 * sigma2 ** 2))
+    return gaussian1 + gaussian2
+
+
+def format_fit_params(amp, mean, sigma):
+    """Format fit parameters for display"""
+    return f'A = {amp:.3f}\nμ = {mean:.1f}\nσ = {sigma:.1f}'
 
 
 def process_file(filename):
+    """Process the endpoint file and create a histogram of the fragment masses with double Gaussian fit"""
     # Extract Z and N from filename
     parts = filename.split('_')
     Z = int(parts[0])
@@ -18,7 +31,7 @@ def process_file(filename):
 
     # Read data from file
     volumes = []
-    with open(filename, 'r') as file:
+    with open(filename) as file:
         for line in file:
             columns = line.strip().split()
             if len(columns) >= 16:
@@ -27,25 +40,55 @@ def process_file(filename):
                 volumes.extend([x * A, (1 - x) * A])
 
     # Create histogram
-    plt.figure(figsize=(10, 6))
-    counts, bins, _ = plt.hist(volumes, bins=A, range=(0, A), density=True, alpha=0.6,
-                               color='skyblue', edgecolor='black')
+    plt.figure(figsize=(12, 7))
+    counts, bins, _ = plt.hist(volumes, bins=A // 2, range=(0, A), density=True, alpha=0.6,
+                               color='skyblue', edgecolor='black', label='Data')
 
-    # Fit Gaussian to the data
+    # Fit double Gaussian to the data
     bin_centers = (bins[:-1] + bins[1:]) / 2
+
+    # Initial guess for parameters [amp1, mean1, sigma1, amp2, mean2, sigma2]
+    # Assuming two peaks roughly symmetric around A/2
+    p0 = [
+        np.max(counts), A * 0.4, A * 0.1,  # First peak
+        np.max(counts), A * 0.6, A * 0.1  # Second peak
+    ]
+
     try:
-        # Initial guess for parameters [amplitude, mean, standard deviation]
-        p0 = [np.max(counts), np.mean(volumes), np.std(volumes)]
-        popt, _ = curve_fit(gaussian, bin_centers, counts, p0=p0)
+        fit_results = curve_fit(double_gaussian, bin_centers, counts, p0=p0)
+        popt = fit_results[0]  # Extract the optimal parameters
 
-        # Generate points for smooth curve
+        # Generate points for smooth curves
         x_fit = np.linspace(0, A, 200)
-        y_fit = gaussian(x_fit, *popt)
+        y_fit_total = double_gaussian(x_fit, *popt)
 
-        # Plot fitted curve
-        plt.plot(x_fit, y_fit, 'r-', linewidth=2, label='Gaussian fit')
-    except:
-        print("Warning: Could not fit Gaussian curve to the data")
+        # Individual Gaussian curves
+        y_fit1 = popt[0] * np.exp(-(x_fit - popt[1]) ** 2 / (2 * popt[2] ** 2))
+        y_fit2 = popt[3] * np.exp(-(x_fit - popt[4]) ** 2 / (2 * popt[5] ** 2))
+
+        # Plot fitted curves
+        plt.plot(x_fit, y_fit_total, 'r-', linewidth=2, label='Total fit')
+        plt.plot(x_fit, y_fit1, '--', color='darkred', linewidth=1.5, label='Peak 1')
+        plt.plot(x_fit, y_fit2, '--', color='darkred', linewidth=1.5, label='Peak 2')
+
+        # Add fit parameters to plot
+        params1 = format_fit_params(popt[0], popt[1], popt[2])
+        params2 = format_fit_params(popt[3], popt[4], popt[5])
+
+        # Position text boxes for parameters
+        plt.text(0.02, 0.98, 'Peak 1:\n' + params1,
+                 transform=plt.gca().transAxes,
+                 verticalalignment='top',
+                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+        plt.text(0.98, 0.98, 'Peak 2:\n' + params2,
+                 transform=plt.gca().transAxes,
+                 horizontalalignment='right',
+                 verticalalignment='top',
+                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+    except RuntimeError as e:
+        print(f"Warning: Could not fit double Gaussian curve to the data: {e}")
 
     plt.xlabel('Fragment Mass (A)')
     plt.ylabel('Probability Density')
@@ -56,9 +99,8 @@ def process_file(filename):
     # Save plot
     output_filename = filename.replace('Endpoints', 'Histogram')
     output_filename = os.path.splitext(output_filename)[0] + '.png'
-    plt.savefig(output_filename, dpi=300, bbox_inches='tight')
+    plt.savefig(output_filename, dpi=600, bbox_inches='tight')
 
-    # Show plot
     plt.show()
     plt.close()
 
