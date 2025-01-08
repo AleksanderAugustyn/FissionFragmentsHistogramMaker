@@ -41,7 +41,7 @@ def create_histogram(ax, data, total_value, xlabel, title, color='skyblue'):
         fit_results = curve_fit(double_gaussian, bin_centers, counts, p0=p0)
         popt = fit_results[0]
 
-        x_fit = np.linspace(0, total_value, 200)
+        x_fit = np.linspace(0.25 * total_value, 0.75 * total_value, 200)
         y_fit_total = double_gaussian(x_fit, *popt)
         y_fit1 = popt[0] * np.exp(-(x_fit - popt[1]) ** 2 / (2 * popt[2] ** 2))
         y_fit2 = popt[3] * np.exp(-(x_fit - popt[4]) ** 2 / (2 * popt[5] ** 2))
