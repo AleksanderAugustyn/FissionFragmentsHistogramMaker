@@ -23,15 +23,18 @@ def format_fit_params(amp, mean, sigma):
 
 def create_histogram(ax, data, total_value, xlabel, title, color='skyblue'):
     """Create a histogram with double Gaussian fit"""
-    counts, bins, _ = ax.hist(data, bins=len(data)//4, range=(0.25 * total_value, 0.75 * total_value), 
-                            density=True, alpha=0.6, color=color, edgecolor='black', label='Data')
+
+    print(total_value)
+
+    counts, bins, _ = ax.hist(data, bins=total_value // 2, range=(0.25 * total_value, 0.75 * total_value),
+                              density=True, alpha=0.6, color=color, edgecolor='black', label='Data')
 
     bin_centers = (bins[:-1] + bins[1:]) / 2
-    
+
     # Initial guess for parameters
     p0 = [
         np.max(counts), total_value * 0.45, 1,  # First peak
-        np.max(counts), total_value * 0.55, 1   # Second peak
+        np.max(counts), total_value * 0.55, 1  # Second peak
     ]
 
     try:
@@ -70,6 +73,7 @@ def create_histogram(ax, data, total_value, xlabel, title, color='skyblue'):
     ax.grid(True, alpha=0.3)
     ax.legend()
 
+
 def process_file(filename):
     """Process the endpoint file and create histograms of fragment masses and charges with double Gaussian fits"""
     # Extract Z and N from filename
@@ -86,23 +90,23 @@ def process_file(filename):
             if len(columns) >= 16:
                 x = float(columns[15])
                 # Add both fragments for mass distribution
-                volumes.extend([x, (1-x)])
+                volumes.extend([x, (1 - x)])
 
     # Create figure with two subplots
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 14))
 
     # Mass distribution (multiply volumes by A)
     mass_data = [v * A for v in volumes]
-    create_histogram(ax1, mass_data, A, 
-                    'Fragment Mass (A)', 
-                    f'Fragment Mass Distribution (Z={Z}, N={N}, A={A})')
+    create_histogram(ax1, mass_data, A,
+                     'Fragment Mass (A)',
+                     f'Fragment Mass Distribution (Z={Z}, N={N}, A={A})')
 
     # Charge distribution (multiply volumes by Z)
     charge_data = [v * Z for v in volumes]
-    create_histogram(ax2, charge_data, Z, 
-                    'Fragment Charge (Z)', 
-                    f'Fragment Charge Distribution (Z={Z}, N={N}, A={A})',
-                    color='lightgreen')
+    create_histogram(ax2, charge_data, Z,
+                     'Fragment Charge (Z)',
+                     f'Fragment Charge Distribution (Z={Z}, N={N}, A={A})',
+                     color='lightgreen')
 
     plt.tight_layout()
 
