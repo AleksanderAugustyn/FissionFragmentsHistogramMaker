@@ -41,7 +41,7 @@ def process_file(filename):
 
     # Create histogram
     plt.figure(figsize=(12, 7))
-    counts, bins, _ = plt.hist(volumes, bins=A // 2, range=(0, A), density=True, alpha=0.6,
+    counts, bins, _ = plt.hist(volumes, bins=A // 2, range=(0.25 * A, 0.75 * A), density=True, alpha=0.6,
                                color='skyblue', edgecolor='black', label='Data')
 
     # Fit double Gaussian to the data
@@ -50,8 +50,8 @@ def process_file(filename):
     # Initial guess for parameters [amp1, mean1, sigma1, amp2, mean2, sigma2]
     # Assuming two peaks roughly symmetric around A/2
     p0 = [
-        np.max(counts), A * 0.4, A * 0.1,  # First peak
-        np.max(counts), A * 0.6, A * 0.1  # Second peak
+        np.max(counts), A * 0.45, 1,  # First peak
+        np.max(counts), A * 0.55, 1  # Second peak
     ]
 
     try:
@@ -68,8 +68,8 @@ def process_file(filename):
 
         # Plot fitted curves
         plt.plot(x_fit, y_fit_total, 'r-', linewidth=2, label='Total fit')
-        plt.plot(x_fit, y_fit1, '--', color='darkred', linewidth=1.5, label='Peak 1')
-        plt.plot(x_fit, y_fit2, '--', color='darkred', linewidth=1.5, label='Peak 2')
+        plt.plot(x_fit, y_fit1, '--', color='black', linewidth=1.5, label='Peak 1')
+        plt.plot(x_fit, y_fit2, '--', color='yellow', linewidth=1.5, label='Peak 2')
 
         # Add fit parameters to plot
         params1 = format_fit_params(popt[0], popt[1], popt[2])
