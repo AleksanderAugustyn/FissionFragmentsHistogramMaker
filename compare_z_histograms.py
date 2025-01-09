@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 from FissionFragmentsHistogramMaker import double_gaussian, format_fit_params
 
 
-def create_z_histogram(ax, data, Z, N, color='lightgreen'):
+def create_z_histogram(ax, data, Z, N, color='lightgreen') -> tuple:
     """Create a histogram with double Gaussian fit with fixed axes"""
     counts, bins, _ = ax.hist(data, bins=40, range=(25, 65),
                               density=True, alpha=0.6, color=color,
@@ -49,9 +49,11 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen'):
                 horizontalalignment='right',
                 verticalalignment='top',
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+        return popt
 
     except RuntimeError as e:
         print(f"Warning: Could not fit double Gaussian curve to the data: {e}")
+        return None
 
     ax.set_xlabel('Fragment Charge (Z)')
     ax.set_ylabel('Probability Density')
@@ -84,11 +86,11 @@ def process_multiple_files(filenames):
 
         # Charge distribution (multiply volumes by Z)
         charge_data = [v * Z for v in volumes]
-        create_z_histogram(axes[idx], charge_data, Z, N)
+        fit_params = create_z_histogram(axes[idx], charge_data, Z, N)
         
         # Store the position of second peak for Z=94, N=146
-        if Z == 94 and N == 146 and 'popt' in locals():
-            reference_peak = popt[4]  # Position of second peak
+        if Z == 94 and N == 146 and fit_params is not None:
+            reference_peak = fit_params[4]  # Position of second peak
     
     # Add vertical reference line if we found the peak
     if reference_peak is not None:
