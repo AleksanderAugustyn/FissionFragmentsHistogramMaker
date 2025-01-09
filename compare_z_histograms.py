@@ -64,6 +64,7 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen'):
 def process_multiple_files(filenames):
     """Process multiple endpoint files and create a combined plot of Z histograms"""
     fig, axes = plt.subplots(4, 1, figsize=(12, 20))
+    reference_peak = None  # Store position of second peak for Z=94
 
     for idx, filename in enumerate(filenames):
         # Extract Z and N from filename
@@ -84,6 +85,17 @@ def process_multiple_files(filenames):
         # Charge distribution (multiply volumes by Z)
         charge_data = [v * Z for v in volumes]
         create_z_histogram(axes[idx], charge_data, Z, N)
+        
+        # Store the position of second peak for Z=94, N=146
+        if Z == 94 and N == 146 and 'popt' in locals():
+            reference_peak = popt[4]  # Position of second peak
+    
+    # Add vertical reference line if we found the peak
+    if reference_peak is not None:
+        for ax in axes:
+            ax.axvline(x=reference_peak, color='black', linestyle=':', linewidth=1.5, 
+                      label='Z=94 Peak 2' if ax == axes[0] else "")
+            ax.legend()
 
     plt.tight_layout()
     plt.savefig('combined_z_histograms.png', dpi=600, bbox_inches='tight')
