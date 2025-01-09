@@ -24,7 +24,7 @@ def format_fit_params(amp, mean, sigma):
 def create_histogram(ax, data, total_value, xlabel, title, color='skyblue'):
     """Create a histogram with double Gaussian fit"""
 
-    print(total_value)
+    # print(total_value)
 
     counts, bins, _ = ax.hist(data, bins=total_value // 2, range=(0.25 * total_value, 0.75 * total_value),
                               density=True, alpha=0.6, color=color, edgecolor='black', label='Data')
@@ -119,6 +119,7 @@ def process_file(filename):
     plt.close()
 
 
-# Process the file
-input_file = "90_140_20.0_0_1000_FG_0.0_Endpoints.txt"
-process_file(input_file)
+if __name__ == "__main__":
+    # Example usage with a single file
+    input_file = "90_140_20.0_0_1000_FG_0.0_Endpoints.txt"
+    process_file(input_file)

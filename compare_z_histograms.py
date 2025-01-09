@@ -4,21 +4,23 @@ This script creates a combined plot of Z histograms from multiple input files.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from FissionFragmentsHistogramMaker import double_gaussian, format_fit_params, process_file
 from scipy.optimize import curve_fit
+
+from FissionFragmentsHistogramMaker import double_gaussian, format_fit_params
+
 
 def create_z_histogram(ax, data, Z, N, color='lightgreen'):
     """Create a histogram with double Gaussian fit with fixed axes"""
     counts, bins, _ = ax.hist(data, bins=40, range=(25, 65),
-                            density=True, alpha=0.6, color=color, 
-                            edgecolor='black', label='Data')
+                              density=True, alpha=0.6, color=color,
+                              edgecolor='black', label='Data')
 
     bin_centers = (bins[:-1] + bins[1:]) / 2
 
     # Initial guess for parameters
     p0 = [
-        np.max(counts), 35, 2,  # First peak
-        np.max(counts), 55, 2   # Second peak
+        np.max(counts), 0.45 * Z, 1,  # First peak
+        np.max(counts), 0.55 * Z, 1  # Second peak
     ]
 
     try:
@@ -58,16 +60,17 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen'):
     ax.grid(True, alpha=0.3)
     ax.legend()
 
+
 def process_multiple_files(filenames):
     """Process multiple endpoint files and create a combined plot of Z histograms"""
     fig, axes = plt.subplots(4, 1, figsize=(12, 20))
-    
+
     for idx, filename in enumerate(filenames):
         # Extract Z and N from filename
         parts = filename.split('_')
         Z = int(parts[0])
         N = int(parts[1])
-        
+
         # Read data from file
         volumes = []
         with open(filename) as file:
@@ -77,7 +80,7 @@ def process_multiple_files(filenames):
                     x = float(columns[15])
                     # Add both fragments for charge distribution
                     volumes.extend([x, (1 - x)])
-        
+
         # Charge distribution (multiply volumes by Z)
         charge_data = [v * Z for v in volumes]
         create_z_histogram(axes[idx], charge_data, Z, N)
@@ -87,12 +90,13 @@ def process_multiple_files(filenames):
     plt.show()
     plt.close()
 
+
 # Example usage with 4 files
 input_files = [
-    "90_140_20.0_0_1000_FG_0.0_Endpoints.txt",
-    "92_142_20.0_0_1000_FG_0.0_Endpoints.txt",
-    "94_144_20.0_0_1000_FG_0.0_Endpoints.txt",
-    "96_146_20.0_0_1000_FG_0.0_Endpoints.txt"
+    "98_152_20.0_0_1000_FG_0.0_Endpoints.txt",
+    "94_146_20.0_0_1000_FG_0.0_Endpoints.txt",
+    "92_144_20.0_0_1000_FG_0.0_Endpoints.txt",
+    "90_140_20.0_0_1000_FG_0.0_Endpoints.txt"
 ]
 
 process_multiple_files(input_files)
