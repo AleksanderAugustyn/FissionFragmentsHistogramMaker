@@ -120,7 +120,7 @@ def process_multiple_files(filenames):
     # Add vertical reference line if we found the peak
     if reference_peak is not None:
         for ax in axes:
-            ax.axvline(x=reference_peak, color='black', linestyle=':', linewidth=1.5,
+            ax.axvline(x=reference_peak, color='black', linestyle=':', linewidth=2,
                        label='Z=94 Peak 2' if ax == axes[0] else "")
             ax.legend()
 
