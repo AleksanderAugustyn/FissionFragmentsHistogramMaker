@@ -65,7 +65,7 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
 
         ax.set_xlabel('Fragment Charge (Z)')
         ax.set_ylabel('Probability Density')
-        ax.set_title(f'Fragment Charge Distribution for {Z + N} {element_name} (Z={Z}, N={N})')
+        ax.set_title(f'Fragment Charge Distribution for $^{{{Z + N}}}${element_name} (Z={Z}, N={N})')
         ax.set_ylim(0, 0.3)
         ax.grid(True, alpha=0.3)
         ax.legend()
