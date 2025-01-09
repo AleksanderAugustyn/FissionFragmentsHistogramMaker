@@ -22,9 +22,10 @@ ELEMENTS = {
 
 def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable | int | float:
     """Create a histogram with double Gaussian fit with fixed axes"""
+    # Create histogram with density=True and multiply counts by 2
     counts, bins, _ = ax.hist(data, bins=40, range=(25, 65),
                               density=True, alpha=0.6, color=color,
-                              edgecolor='black', label='Data')
+                              edgecolor='black', label='Data', weights=np.full_like(data, 2))
     
     # Calculate sum of probability densities
     bin_width = bins[1] - bins[0]
