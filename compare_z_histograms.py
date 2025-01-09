@@ -61,22 +61,21 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
                 verticalalignment='top',
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
+        element_name = ELEMENTS.get(Z, "Unknown Element")
+
         ax.set_xlabel('Fragment Charge (Z)')
         ax.set_ylabel('Probability Density')
-        element_name = ELEMENTS.get(Z, f"Z={Z}")
-        total_nucleons = str(Z + N).translate(superscript)
-        ax.set_title(f'Fragment Charge Distribution for {total_nucleons}{element_name} (Z={Z}, N={N})')
+        ax.set_title(f'Fragment Charge Distribution for {Z + N} {element_name} (Z={Z}, N={N})')
         ax.set_ylim(0, 0.3)
         ax.grid(True, alpha=0.3)
         ax.legend()
 
         return popt
 
-
     except RuntimeError as e:
         print(f"Warning: Could not fit double Gaussian curve to the data: {e}")
         ax.set_xlabel('Fragment Charge (Z)')
-    ax.set_ylabel('Probability Density')
+        ax.set_ylabel('Probability Density')
         ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
         ax.set_ylim(0, 0.3)
         ax.grid(True, alpha=0.3)
