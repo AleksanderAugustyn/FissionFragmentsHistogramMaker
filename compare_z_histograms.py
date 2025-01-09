@@ -72,8 +72,6 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
 
         return popt
 
-    # Dictionary for superscript numbers
-    superscript = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
 
     except RuntimeError as e:
         print(f"Warning: Could not fit double Gaussian curve to the data: {e}")
