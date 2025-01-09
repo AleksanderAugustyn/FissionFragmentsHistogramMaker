@@ -25,6 +25,11 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
     counts, bins, _ = ax.hist(data, bins=40, range=(25, 65),
                               density=True, alpha=0.6, color=color,
                               edgecolor='black', label='Data')
+    
+    # Calculate sum of probability densities
+    bin_width = bins[1] - bins[0]
+    prob_density_sum = np.sum(counts) * bin_width
+    print(f"Sum of probability densities: {prob_density_sum:.3f}")
 
     bin_centers = (bins[:-1] + bins[1:]) / 2
 
