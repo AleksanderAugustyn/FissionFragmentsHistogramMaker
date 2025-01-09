@@ -49,18 +49,25 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> tuple:
                 horizontalalignment='right',
                 verticalalignment='top',
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+        ax.set_xlabel('Fragment Charge (Z)')
+        ax.set_ylabel('Probability Density')
+        ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
+        ax.set_ylim(0, 0.3)
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+        
         return popt
 
     except RuntimeError as e:
         print(f"Warning: Could not fit double Gaussian curve to the data: {e}")
+        ax.set_xlabel('Fragment Charge (Z)')
+        ax.set_ylabel('Probability Density') 
+        ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
+        ax.set_ylim(0, 0.3)
+        ax.grid(True, alpha=0.3)
+        ax.legend()
         return None
-
-    ax.set_xlabel('Fragment Charge (Z)')
-    ax.set_ylabel('Probability Density')
-    ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
-    ax.set_ylim(0, 0.3)
-    ax.grid(True, alpha=0.3)
-    ax.legend()
 
 
 def process_multiple_files(filenames):
