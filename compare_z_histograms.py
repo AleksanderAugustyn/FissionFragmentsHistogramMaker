@@ -1,15 +1,17 @@
 """
 This script creates a combined plot of Z histograms from multiple input files.
 """
+from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy import ndarray
 from scipy.optimize import curve_fit
 
 from FissionFragmentsHistogramMaker import double_gaussian, format_fit_params
 
 
-def create_z_histogram(ax, data, Z, N, color='lightgreen') -> tuple:
+def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable | int | float:
     """Create a histogram with double Gaussian fit with fixed axes"""
     counts, bins, _ = ax.hist(data, bins=40, range=(25, 65),
                               density=True, alpha=0.6, color=color,
