@@ -64,14 +64,16 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
         ax.set_xlabel('Fragment Charge (Z)')
         ax.set_ylabel('Probability Density')
         element_name = ELEMENTS.get(Z, f"Z={Z}")
-        ax.set_title(f'Fragment Charge Distribution for {Z + N}{element_name} (Z={Z}, N={N})')
+        total_nucleons = str(Z + N).translate(superscript)
+        ax.set_title(f'Fragment Charge Distribution for {total_nucleons}{element_name} (Z={Z}, N={N})')
         ax.set_ylim(0, 0.3)
         ax.grid(True, alpha=0.3)
         ax.legend()
 
         return popt
 
-    superscript = str.maketrans("01
+    # Dictionary for superscript numbers
+    superscript = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
 
     except RuntimeError as e:
         print(f"Warning: Could not fit double Gaussian curve to the data: {e}")
