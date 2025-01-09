@@ -1,6 +1,14 @@
 """
 This script creates a combined plot of Z histograms from multiple input files.
 """
+
+# Dictionary mapping atomic numbers to element names
+ELEMENTS = {
+    90: "Thorium",
+    92: "Uranium",
+    94: "Plutonium",
+    98: "Californium"
+}
 from typing import Iterable
 
 import matplotlib.pyplot as plt
@@ -54,7 +62,8 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
 
         ax.set_xlabel('Fragment Charge (Z)')
         ax.set_ylabel('Probability Density')
-        ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
+        element_name = ELEMENTS.get(Z, f"Z={Z}")
+        ax.set_title(f'Fragment Charge Distribution ({element_name}, N={N})')
         ax.set_ylim(0, 0.3)
         ax.grid(True, alpha=0.3)
         ax.legend()
