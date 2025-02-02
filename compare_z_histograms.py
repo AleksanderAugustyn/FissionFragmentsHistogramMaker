@@ -16,7 +16,8 @@ ELEMENTS = {
     90: "Th",
     92: "U",
     94: "Pu",
-    98: "Ca"
+    96: "Cm",
+    98: "Cf"
 }
 
 
@@ -25,7 +26,7 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
     counts, bins, _ = ax.hist(data, bins=40, range=(25, 65),
                               density=True, alpha=0.6, color=color,
                               edgecolor='black', label='Data')
-    
+
     # Calculate sum of probability densities
     bin_width = bins[1] - bins[0]
     prob_density_sum = np.sum(counts) * bin_width
@@ -48,32 +49,33 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
         y_fit1 = popt[0] * np.exp(-(x_fit - popt[1]) ** 2 / (2 * popt[2] ** 2))
         y_fit2 = popt[3] * np.exp(-(x_fit - popt[4]) ** 2 / (2 * popt[5] ** 2))
 
-        ax.plot(x_fit, y_fit_total, 'r-', linewidth=2, label='Total fit')
+        # ax.plot(x_fit, y_fit_total, 'r-', linewidth=2, label='Total fit')
         ax.plot(x_fit, y_fit1, '--', color='black', linewidth=1.5, label='Peak 1')
-        ax.plot(x_fit, y_fit2, '--', color='yellow', linewidth=1.5, label='Peak 2')
+        ax.plot(x_fit, y_fit2, '--', color='red', linewidth=1.5, label='Peak 2')
 
         params1 = format_fit_params(popt[0], popt[1], popt[2])
         params2 = format_fit_params(popt[3], popt[4], popt[5])
 
-        ax.text(0.02, 0.98, 'Peak 1:\n' + params1,
-                transform=ax.transAxes,
-                verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
-
-        ax.text(0.98, 0.98, 'Peak 2:\n' + params2,
-                transform=ax.transAxes,
-                horizontalalignment='right',
-                verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+        # ax.text(0.02, 0.98, 'Peak 1:\n' + params1,
+        #         transform=ax.transAxes,
+        #         verticalalignment='top',
+        #         bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+        #
+        # ax.text(0.98, 0.98, 'Peak 2:\n' + params2,
+        #         transform=ax.transAxes,
+        #         horizontalalignment='right',
+        #         verticalalignment='top',
+        #         bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
         element_name = ELEMENTS.get(Z, "Unknown Element")
 
-        ax.set_xlabel('Fragment Charge (Z)', fontsize=14)
-        ax.set_ylabel('Probability Density', fontsize=14)
-        ax.set_title(f'Fragment Charge Distribution for $^{{{Z + N}}}${element_name} (Z={Z}, N={N})', fontsize=16)
+        ax.set_xlabel('Fragment Charge (Z)', fontsize=16)
+        ax.set_ylabel('Probability Density', fontsize=16)
+        ax.tick_params(axis='both', which='major', labelsize=16)
+        ax.set_title(f'$^{{{Z + N}}}${element_name}', fontsize=20)
         ax.set_ylim(0, 0.3)
         ax.grid(True, alpha=0.3)
-        ax.legend()
+        #ax.legend()
 
         return popt
 
@@ -84,13 +86,13 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
         ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
         ax.set_ylim(0, 0.3)
         ax.grid(True, alpha=0.3)
-        ax.legend()
+        #ax.legend(False)
         return None
 
 
-def process_multiple_files(filenames):
+def process_multiple_files(filenames, energy):
     """Process multiple endpoint files and create a combined plot of Z histograms"""
-    fig, axes = plt.subplots(4, 1, figsize=(12, 20))
+    fig, axes = plt.subplots(5, 1, figsize=(12, 20))
     reference_peak = None  # Store position of second peak for Z=94
 
     for idx, filename in enumerate(filenames):
@@ -122,20 +124,24 @@ def process_multiple_files(filenames):
         for ax in axes:
             ax.axvline(x=reference_peak, color='black', linestyle=':', linewidth=2,
                        label='Z=94 Peak 2' if ax == axes[0] else "")
-            ax.legend()
+            # ax.legend()
+
+    output_filename = f'combined_z_histograms_{energy}.png'
 
     plt.tight_layout()
-    plt.savefig('combined_z_histograms.png', dpi=600, bbox_inches='tight')
+    plt.savefig(output_filename, dpi=600, bbox_inches='tight')
     plt.show()
     plt.close()
 
 
-# Example usage with 4 files
+energy = 26.0
+# Example usage with 5 files
 input_files = [
-    "98_152_20.0_0_1000_FG_0.0_Endpoints.txt",
-    "94_146_20.0_0_1000_FG_0.0_Endpoints.txt",
-    "92_144_20.0_0_1000_FG_0.0_Endpoints.txt",
-    "90_140_20.0_0_1000_FG_0.0_Endpoints.txt"
+    f"98_152_{energy}_0_1000_FG_0.0_Endpoints.txt",
+    f"96_150_{energy}_0_1000_FG_0.0_Endpoints.txt",
+    f"94_146_{energy}_0_1000_FG_0.0_Endpoints.txt",
+    f"92_144_{energy}_0_1000_FG_0.0_Endpoints.txt",
+    f"90_140_{energy}_0_1000_FG_0.0_Endpoints.txt"
 ]
 
-process_multiple_files(input_files)
+process_multiple_files(input_files, energy)
