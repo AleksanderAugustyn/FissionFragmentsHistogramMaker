@@ -13,11 +13,22 @@ from FissionFragmentsHistogramMaker import double_gaussian, format_fit_params
 
 # Dictionary mapping atomic numbers to element names
 ELEMENTS = {
+    88: "Ra",
     90: "Th",
     92: "U",
     94: "Pu",
     96: "Cm",
-    98: "Cf"
+    98: "Cf",
+    100: "Fm",
+    102: "No",
+    104: "Rf",
+    106: "Sg",
+    108: "Hs",
+    110: "Ds",
+    112: "Cn",
+    114: "Fl",
+    116: "Lv",
+    118: "Og"
 }
 
 
