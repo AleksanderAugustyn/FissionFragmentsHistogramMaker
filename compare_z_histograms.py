@@ -2,11 +2,11 @@
 This script creates a combined plot of Z histograms from multiple input files.
 """
 
-from typing import Iterable
+
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import ndarray
 from scipy.optimize import curve_fit
 
 from FissionFragmentsHistogramMaker import double_gaussian, format_fit_params
@@ -32,7 +32,7 @@ ELEMENTS = {
 }
 
 
-def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable | int | float:
+def create_z_histogram(ax, data, Z, N, color='lightgreen') -> Optional[np.ndarray]:
     """Create a histogram with double Gaussian fit with fixed axes"""
     counts, bins, _ = ax.hist(data, bins=40, range=(25, 65),
                               density=True, alpha=0.6, color=color,
@@ -52,8 +52,7 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> ndarray | Iterable
     ]
 
     try:
-        fit_results = curve_fit(double_gaussian, bin_centers, counts, p0=p0)
-        popt = fit_results[0]
+        popt, pcov = curve_fit(double_gaussian, bin_centers, counts, p0=p0)
 
         x_fit = np.linspace(25, 65, 200)
         y_fit_total = double_gaussian(x_fit, *popt)
@@ -145,14 +144,14 @@ def process_multiple_files(filenames, energy):
     plt.close()
 
 
-energy = 26.0
+excitation_energy = 26.0
 # Example usage with 5 files
 input_files = [
-    f"98_152_{energy}_0_1000_FG_0.0_Endpoints.txt",
-    f"96_150_{energy}_0_1000_FG_0.0_Endpoints.txt",
-    f"94_146_{energy}_0_1000_FG_0.0_Endpoints.txt",
-    f"92_144_{energy}_0_1000_FG_0.0_Endpoints.txt",
-    f"90_140_{energy}_0_1000_FG_0.0_Endpoints.txt"
+    f"98_152_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
+    f"96_150_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
+    f"94_146_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
+    f"92_144_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
+    f"90_140_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt"
 ]
 
-process_multiple_files(input_files, energy)
+process_multiple_files(input_files, excitation_energy)
