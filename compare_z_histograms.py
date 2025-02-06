@@ -51,9 +51,25 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> Optional[np.ndarra
         np.max(counts), 0.55 * Z, 1  # Second peak
     ]
 
-    try:
-        popt, pcov = curve_fit(double_gaussian, bin_centers, counts, p0=p0)
+    fit_success = False
+    amplitude_offsets = [0, 0.05, -0.05]  # Offsets to try for amplitude (0%, +5%, -5% of initial guess)
 
+    for amplitude_offset_factor in amplitude_offsets:
+        current_p0 = [
+            p0[0] * (1 + amplitude_offset_factor), p0[1], p0[2],  # Peak 1: Amp, Mean, Sigma
+            p0[3] * (1 + amplitude_offset_factor), p0[4], p0[5]  # Peak 2: Amp, Mean, Sigma
+        ]
+        try:
+            fit_results = curve_fit(double_gaussian, bin_centers, counts, p0=current_p0)
+            popt = fit_results[0]
+            fit_success = True  # Fit successful in this try
+            break  # Exit the loop if fit is successful
+        except RuntimeError as e:
+            print(f"Warning: Could not fit double Gaussian curve with amplitude offset {amplitude_offset_factor*100:.2f}%: {e}")
+            continue  # Try next amplitude offset
+
+
+    if fit_success:
         x_fit = np.linspace(25, 65, 200)
         y_fit_total = double_gaussian(x_fit, *popt)
         y_fit1 = popt[0] * np.exp(-(x_fit - popt[1]) ** 2 / (2 * popt[2] ** 2))
@@ -90,7 +106,7 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> Optional[np.ndarra
         return popt
 
     except RuntimeError as e:
-        print(f"Warning: Could not fit double Gaussian curve to the data: {e}")
+        print(f"Warning: Could not fit double Gaussian curve to the  {e}")
         ax.set_xlabel('Fragment Charge (Z)')
         ax.set_ylabel('Probability Density')
         ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
