@@ -2,7 +2,6 @@
 This script creates a combined plot of Z histograms from multiple input files.
 """
 
-
 from typing import Optional
 
 import matplotlib.pyplot as plt
@@ -52,22 +51,23 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> Optional[np.ndarra
     ]
 
     fit_success = False
-    amplitude_offsets = [0, 0.05, -0.05]  # Offsets to try for amplitude (0%, +5%, -5% of initial guess)
+    amplitude_offsets = [0, 0.05, -0.05, 0.1, -0.1]  # Offsets to try for amplitude (0%, +5%, -5% of initial guess)
+    mean_offsets = [0, 0.5, -0.5]  # Offsets to try for mean (0%, +5%, -5% of initial guess)
 
     for amplitude_offset_factor in amplitude_offsets:
-        current_p0 = [
-            p0[0] * (1 + amplitude_offset_factor), p0[1], p0[2],  # Peak 1: Amp, Mean, Sigma
-            p0[3] * (1 + amplitude_offset_factor), p0[4], p0[5]  # Peak 2: Amp, Mean, Sigma
-        ]
-        try:
-            fit_results = curve_fit(double_gaussian, bin_centers, counts, p0=current_p0)
-            popt = fit_results[0]
-            fit_success = True  # Fit successful in this try
-            break  # Exit the loop if fit is successful
-        except RuntimeError as e:
-            print(f"Warning: Could not fit double Gaussian curve with amplitude offset {amplitude_offset_factor*100:.2f}%: {e}")
-            continue  # Try next amplitude offset
-
+        for mean_offset_factor in mean_offsets:
+            current_p0 = [
+                p0[0] * (1 + amplitude_offset_factor), p0[1] + mean_offset_factor, p0[2],  # Peak 1: Amp, Mean, Sigma
+                p0[3] * (1 + amplitude_offset_factor), p0[4] + mean_offset_factor, p0[5]  # Peak 2: Amp, Mean, Sigma
+            ]
+            try:
+                fit_results = curve_fit(double_gaussian, bin_centers, counts, p0=current_p0)
+                popt = fit_results[0]
+                fit_success = True  # Fit successful in this try
+                break  # Exit the loop if fit is successful
+            except RuntimeError as e:
+                print(f"Warning: Could not fit double Gaussian curve with amplitude offset {amplitude_offset_factor * 100:.2f}%: {e}")
+                continue
 
     if fit_success:
         x_fit = np.linspace(25, 65, 200)
@@ -104,7 +104,6 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> Optional[np.ndarra
         #ax.legend()
 
         return popt
-
 
     print(f"Warning: Could not fit double Gaussian curve to the data")
     ax.set_xlabel('Fragment Charge (Z)')
