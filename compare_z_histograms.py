@@ -105,15 +105,15 @@ def create_z_histogram(ax, data, Z, N, color='lightgreen') -> Optional[np.ndarra
 
         return popt
 
-    except RuntimeError as e:
-        print(f"Warning: Could not fit double Gaussian curve to the  {e}")
-        ax.set_xlabel('Fragment Charge (Z)')
-        ax.set_ylabel('Probability Density')
-        ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
-        ax.set_ylim(0, 0.3)
-        ax.grid(True, alpha=0.3)
-        #ax.legend(False)
-        return None
+
+    print(f"Warning: Could not fit double Gaussian curve to the data")
+    ax.set_xlabel('Fragment Charge (Z)')
+    ax.set_ylabel('Probability Density')
+    ax.set_title(f'Fragment Charge Distribution (Z={Z}, N={N})')
+    ax.set_ylim(0, 0.3)
+    ax.grid(True, alpha=0.3)
+    #ax.legend(False)
+    return None
 
 
 def process_multiple_files(filenames, energy):
