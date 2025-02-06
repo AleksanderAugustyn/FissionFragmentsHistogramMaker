@@ -144,14 +144,16 @@ def process_multiple_files(filenames, energy):
     plt.close()
 
 
-excitation_energy = 26.0
-# Example usage with 5 files
-input_files = [
-    f"98_152_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
-    f"96_150_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
-    f"94_146_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
-    f"92_144_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
-    f"90_140_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt"
-]
+excitation_energies = [8.0, 20.0, 26.0]
 
-process_multiple_files(input_files, excitation_energy)
+for excitation_energy in excitation_energies:
+    # Example usage with 5 files
+    input_files = [
+        f"98_152_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
+        f"96_150_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
+        f"94_146_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
+        f"92_144_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt",
+        f"90_140_{excitation_energy}_0_1000_FG_0.0_Endpoints.txt"
+    ]
+
+    process_multiple_files(input_files, excitation_energy)
